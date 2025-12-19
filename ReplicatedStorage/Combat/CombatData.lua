@@ -4,11 +4,11 @@
 local CombatData = {}
 
 CombatData.Animations = {
-	M1_1 = "rbxassetid://80703820989833",
-	M1_2 = "rbxassetid://99500623255862",
-	M1_3 = "rbxassetid://79196933628226",
-	M1_4 = "rbxassetid://107015278536598",
-	M1_5 = "rbxassetid://99993110544244",
+	M1_1 = "rbxassetid://125887780552173",
+	M1_2 = "rbxassetid://117601396867564",
+	M1_3 = "rbxassetid://136275380500598",
+	M1_4 = "rbxassetid://84651418428065",
+	M1_5 = "rbxassetid://117601396867564",
 	CRIT = "rbxassetid://118141835488799",
 	KNOCKBACK = "rbxassetid://108512375962910",
 
@@ -17,19 +17,19 @@ CombatData.Animations = {
 	DASH_RIGHT = "rbxassetid://118520799563131",
 	DASH_BACK = "rbxassetid://72998974255918",
 
-	BLOCK = "rbxassetid://112061974623225",
+	BLOCK = "rbxassetid://109320404874054",
 	PARRY_LEFT = "rbxassetid://138880173548582",
 	PARRY_RIGHT = "rbxassetid://75828326431698",
 	BEING_PARRIED_1 = "rbxassetid://87916664643279",
 	BEING_PARRIED_2 = "rbxassetid://135483064076831",
 	BLOCK_BREAKED = "rbxassetid://71477739324878",
 
-	HIT_1 = "rbxassetid://92861080426324",
-	HIT_2 = "rbxassetid://123781164687474",
-	HIT_3 = "rbxassetid://77943716617257",
-	HIT_4 = "rbxassetid://105729820225182",
+	HIT_1 = "rbxassetid://76138860200822",
+	HIT_2 = "rbxassetid://76138860200822",
+	HIT_3 = "rbxassetid://76138860200822",
+	HIT_4 = "rbxassetid://76138860200822",
 
-	RUN = "rbxassetid://96843159646986"
+	RUN = "rbxassetid://81830571150205"
 }
 
 CombatData.Settings = {
