@@ -141,6 +141,11 @@ RunService.Heartbeat:Connect(function()
 		return
 	end
 
+	-- If hit slowed or block release slowed, let those systems handle speed
+	if GetBool("IsHitSlowed") or GetBool("BlockReleaseSlow") then
+		return -- Don't override the slow
+	end
+
 	local targetSpeed = BaseWalkSpeed
 
 	-- Priority: Blocking > Swinging > Normal

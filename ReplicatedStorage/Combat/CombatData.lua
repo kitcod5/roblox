@@ -57,9 +57,20 @@ CombatData.Settings = {
 	KNOCKBACK_DURATION = 0.12,
 
 	-- ===== STUN DURATIONS =====
-	HITSTUN = 0.25,           -- When you get hit
+	HITSTUN = 0.4,            -- When you get hit (increased so you can't walk out)
 	PARRY_PUNISH = 1.2,       -- Attacker stunned when parried
 	BLOCK_BREAK_STUN = 0.9,   -- When your block is broken
+
+	-- ===== HIT SLOW (can't walk out of M1s) =====
+	HIT_SLOW_SPEED = 4,       -- Speed while being hit
+	HIT_SLOW_DURATION = 0.35, -- How long you're slowed after hit
+
+	-- ===== BLOCK RELEASE SLOW =====
+	BLOCK_RELEASE_SLOW = 8,       -- Speed after releasing block
+	BLOCK_RELEASE_DURATION = 0.4, -- How long the slow lasts
+
+	-- ===== COMBO ENDER COOLDOWN =====
+	COMBO_END_COOLDOWN = 0.8, -- Extra cooldown after 5th M1 (combo ender)
 
 	-- ===== PARRY SYSTEM =====
 	PARRY_WINDOW = 0.25,      -- How long parry is active (tap F)

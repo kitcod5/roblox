@@ -79,6 +79,27 @@ local function Stun(plr, duration, stunType)
 	end)
 end
 
+-- Apply hit slow (so you can't walk out of M1s)
+local function ApplyHitSlow(plr)
+	local char = plr.Character
+	if not char then return end
+	local hum = char:FindFirstChild("Humanoid")
+	if not hum then return end
+
+	SetBool(char, "IsHitSlowed", true)
+	hum.WalkSpeed = CombatData.Settings.HIT_SLOW_SPEED
+
+	task.delay(CombatData.Settings.HIT_SLOW_DURATION, function()
+		if char and char:FindFirstChild("IsHitSlowed") then
+			SetBool(char, "IsHitSlowed", false)
+			-- Only restore if not in other slow states
+			if not GetBool(char, "IsStunned") and not GetBool(char, "IsBlocking") then
+				hum.WalkSpeed = CombatData.Settings.WALK_SPEED
+			end
+		end
+	end)
+end
+
 -- Grant counter window (CAN ATTACK IMMEDIATELY)
 local function GrantCounterWindow(plr, duration)
 	local char = plr.Character
@@ -171,9 +192,10 @@ local function DoDamage(attackerChar, targets, dmg, isCrit, isFlourish)
 				Knockback(attackerChar, t.char, 18, 0.1)
 				t.hum:TakeDamage(dmg)
 			else
-				-- Blocked - no damage
+				-- Blocked - no damage, but play VFX
 				if targetPlr then
 					CombatRemote:FireClient(targetPlr, "BLOCKED")
+					CombatRemote:FireClient(targetPlr, "BLOCK_VFX") -- VFX for blocking
 				end
 				if attackerPlr then
 					CombatRemote:FireClient(attackerPlr, "HIT_BLOCKED")
@@ -183,9 +205,10 @@ local function DoDamage(attackerChar, targets, dmg, isCrit, isFlourish)
 			-- NOT BLOCKING - Full damage
 			t.hum:TakeDamage(dmg)
 
-			-- Hitstun
+			-- Hitstun + Hit slow (can't walk out of M1s)
 			if targetPlr then
 				Stun(targetPlr, CombatData.Settings.HITSTUN, "hitstun")
+				ApplyHitSlow(targetPlr) -- Slow them down so they can't walk out
 			end
 
 			-- Knockback
@@ -233,8 +256,13 @@ local function HandleM1(plr)
 	local state = GetState(plr)
 	local now = tick()
 
-	-- Cooldown check
-	if now - state.LastM1 < CombatData.Settings.M1_COOLDOWN then return end
+	-- Cooldown check (longer after combo ender)
+	local cooldown = CombatData.Settings.M1_COOLDOWN
+	if state.LastComboWasFinisher then
+		cooldown = CombatData.Settings.COMBO_END_COOLDOWN
+		state.LastComboWasFinisher = false
+	end
+	if now - state.LastM1 < cooldown then return end
 
 	-- Combo logic
 	if now - state.LastComboTime > CombatData.Settings.COMBO_RESET then
@@ -246,6 +274,11 @@ local function HandleM1(plr)
 	state.LastComboTime = now
 
 	local isFlourish = (state.Combo == 5)
+
+	-- Mark if this was the combo finisher (for longer cooldown next time)
+	if isFlourish then
+		state.LastComboWasFinisher = true
+	end
 
 	-- Play animation on client
 	CombatRemote:FireClient(plr, "PLAY_M1", state.Combo)

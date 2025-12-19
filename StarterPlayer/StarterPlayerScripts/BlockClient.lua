@@ -122,6 +122,69 @@ local function StopBlock()
 	StopAllBlockAnims()
 
 	CombatRemote:FireServer("BLOCK_STOP")
+
+	-- Apply block release slow
+	SetBool("BlockReleaseSlow", true)
+	humanoid.WalkSpeed = CombatData.Settings.BLOCK_RELEASE_SLOW
+	task.delay(CombatData.Settings.BLOCK_RELEASE_DURATION, function()
+		if character and character:FindFirstChild("BlockReleaseSlow") then
+			SetBool("BlockReleaseSlow", false)
+			-- Only restore if not in other slow states
+			if not GetBool("IsStunned") and not GetBool("IsBlocking") and not GetBool("IsHitSlowed") then
+				humanoid.WalkSpeed = CombatData.Settings.WALK_SPEED
+			end
+		end
+	end)
+end
+
+-- Create block VFX effect
+local function PlayBlockVFX()
+	local rootPart = character:FindFirstChild("HumanoidRootPart")
+	if not rootPart then return end
+
+	-- Create a quick flash/spark effect
+	local part = Instance.new("Part")
+	part.Name = "BlockVFX"
+	part.Size = Vector3.new(0.5, 0.5, 0.5)
+	part.Anchored = true
+	part.CanCollide = false
+	part.Transparency = 0.3
+	part.Color = Color3.fromRGB(255, 255, 255)
+	part.Material = Enum.Material.Neon
+	part.CFrame = rootPart.CFrame * CFrame.new(0, 0, -2)
+	part.Parent = workspace
+
+	-- Particle effect
+	local attachment = Instance.new("Attachment")
+	attachment.Parent = part
+
+	local particles = Instance.new("ParticleEmitter")
+	particles.Color = ColorSequence.new(Color3.fromRGB(200, 200, 255))
+	particles.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(1, 0)
+	})
+	particles.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.3),
+		NumberSequenceKeypoint.new(1, 1)
+	})
+	particles.Lifetime = NumberRange.new(0.1, 0.2)
+	particles.Speed = NumberRange.new(10, 20)
+	particles.SpreadAngle = Vector2.new(180, 180)
+	particles.Rate = 0
+	particles.Parent = attachment
+
+	particles:Emit(15)
+
+	-- Sound effect (optional)
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://12222084" -- Metal clang sound
+	sound.Volume = 0.5
+	sound.Parent = part
+	sound:Play()
+
+	-- Cleanup
+	game.Debris:AddItem(part, 0.5)
 end
 
 local function StartBlock()
@@ -223,6 +286,10 @@ CombatRemote.OnClientEvent:Connect(function(action, data)
 	elseif action == "BLOCKED" then
 		-- We blocked an attack (not parried)
 		print("[BLOCK] Blocked attack!")
+
+	elseif action == "BLOCK_VFX" then
+		-- Play VFX when blocking a hit
+		PlayBlockVFX()
 	end
 end)
 
